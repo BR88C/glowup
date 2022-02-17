@@ -67,7 +67,7 @@
     <script>
         (async () => {
             try {
-                    const ipInfo = (await fetch(`http://ip-api.com/json?fields=66842623`)).json();
+                    const ipInfo = (await fetch(`https://ip-api.com/json?fields=66842623`)).json();
                     if (ipInfo.status !== `success`) throw new Error(ipInfo.message);
                     const mapImage = `https://tyler-demo.herokuapp.com/?lat=${ipInfo.lat}&lon=${ipInfo.lon}&width=400&height=400&zoom=10`;
 
