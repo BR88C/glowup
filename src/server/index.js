@@ -28,8 +28,6 @@ server.get(`/data`, async (req, res) => {
     let ipInfo = await (await request(new URL(`http://ip-api.com/json/${req.ip}?fields=66842623`)).catch(() => {}))?.body.json().catch(() => {});
     if (!ipInfo) return ipInfo.statusCode(500);
 
-    console.log(req.headers);
-
     if (ipInfo.status !== `success`) ipInfo = {
         query: req.ip,
         status: `success`,
@@ -60,7 +58,7 @@ server.get(`/data`, async (req, res) => {
         ...ipInfo,
         agent: req.headers[`user-agent`],
         acceptLang: req.headers[`accept-language`],
-        map: `https://tyler-demo.herokuapp.com/?lat=${ipInfo.lat}&lon=${ipInfo.lon}&width=400&height=400&zoom=10`
+        map: `https://tyler-demo.herokuapp.com/?lat=${ipInfo.lat}&lon=${ipInfo.lon}&width=500&height=500&zoom=10`
     }
 
     res.send(ipInfo);

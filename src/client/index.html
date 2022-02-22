@@ -23,12 +23,26 @@
         body {
             overflow: hidden;
             margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
             background-color: black;
         }
 
+        .loading {
+            position: absolute;
+            margin-top: 20%;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 4vh;
+        }
+
         .start-btn {
+            position: absolute;
             width: 40%;
-            margin-top: 10%;
+            margin-top: 20%;
             margin-left: 30%;
             padding: 2vh;
             border-radius: 1vh;
@@ -36,6 +50,7 @@
             font-size: 3vh;
             font-weight: 700;
             cursor: pointer;
+            z-index: 3;
         }
 
         .disclaimer {
@@ -43,7 +58,6 @@
             bottom: 0;
             width: 100%;
             text-align: center;
-            color: white;
             font-size: 1.4vh;
         }
 
@@ -54,15 +68,67 @@
             width: 100%;
             height: 100%;
         }
+
+        @media only screen and (min-aspect-ratio: 1 / 1) {
+            .glowup-video {
+                object-fit: cover;
+            }
+        }
+
+        .text {
+            height: 100vh;
+            top: 0;
+            position: absolute;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .text,
+        .text span {
+            z-index: 1;
+            font-size: 4vh;
+        }
+
+        .map-container {
+            height: 100vh;
+            top: 0;
+            display: flex;
+            position: absolute;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            z-index: 2;
+        }
     </style>
 </head>
 
 <body>
-    <button id="start-btn" class="start-btn">Click to get firmware!</button>
+    <h1 id="loading" class="loading">Loading...</h1>
+
+    <button id="start-btn" class="start-btn" style="visibility: hidden;">Click to get firmware!</button>
 
     <video id="glowup-video" class="glowup-video" style="visibility: hidden;">
         <source src="/glowup.mp4" type="video/mp4" />
     </video>
+
+    <div id="text" class="text"></div>
+
+    <div id="map-container" class="map-container" style="visibility: hidden;">
+        <img id="map">
+    </div>
+
 
     <script>
         (async () => {
@@ -75,19 +141,15 @@
                 try {
                     webGL = canvas.getContext(`webgl`) ?? canvas.getContext(`experimental-webgl`);
                     webGLDebugInfo = webGL?.getExtension(`RENDERER`) ?? webGL?.getExtension(`WEBGL_debug_renderer_info`);
-                } catch (error) {}
+                } catch (error) { }
 
                 const stage1Data = [
                     ['IP', ipInfo.query],
                     ['ISP', ipInfo.isp],
                     ['ORG', ipInfo.org],
-                    ['Autonomous System', ipInfo.asname ?? ipInfo.as],
-                    ['Mobile', ipInfo.mobile],
                     ['Proxy', ipInfo.proxy],
                     ['Hosting', ipInfo.hosting],
                     ['User Agent', ipInfo.agent],
-                    ['Local UA', window.navigator?.userAgent],
-                    ['Language Headers', ipInfo.acceptLang],
                     ['Cookies Enabled', !!window.navigator?.cookieEnabled],
                 ];
 
@@ -102,26 +164,103 @@
                     ['Timezone', ipInfo.timezone],
                     ['Local Time', new Date().toLocaleTimeString()],
                     ['Currency', ipInfo.currency],
+                    ['Language Headers', ipInfo.acceptLang],
                     ['Enabled Languages', window.navigator?.languages?.join(`, `) ?? `en-US`],
+                    ['Autonomous System', ipInfo.asname ?? ipInfo.as],
                     ['OS', window.navigator?.oscpu ?? window.navigator?.platform ?? `<Unknown>`],
                     ['CPU Threads', window.navigator?.hardwareConcurrency ?? 1],
-                    ['Memory', `${window.navigator?.deviceMemory ?? (performance.memory?.jsHeapSizeLimit ?? 0) / (1024 ** 3)  ?? `<Unknown>`}Gb`],
+                    ['Memory', `${window.navigator?.deviceMemory ?? (performance.memory?.jsHeapSizeLimit ?? 0) / (1024 ** 3) ?? `<Unknown>`}Gb`],
                     ['Heap Size Limit', `${(performance.memory?.jsHeapSizeLimit ?? 0) / 1024}Kb`],
                     ['GPU Vendor', webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_VENDOR_WEBGL) ?? `<Unknown>` : `<Unknown>`],
                     ['GPU Info', webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_RENDERER_WEBGL) ?? `<Unknown>` : `<Unknown>`],
+                    ['Mobile', ipInfo.mobile],
                     ['Touch Enabled', window.navigator?.maxTouchPoints > 0],
-                    ['Battery', typeof window.navigator?.getBattery === `function` ? `${((await window.navigator.getBattery()).level ?? 1) * 100}%` : `Unavailable`]
+                    ['Battery', typeof window.navigator?.getBattery === `function` ? `${((await window.navigator.getBattery()).level ?? 1) * 100}%` : `Unavailable`],
+                    ['Trolled', `true`]
                 ];
 
+
+                const loading = document.getElementById(`loading`);
                 const startBtn = document.getElementById(`start-btn`);
                 const glowupVideo = document.getElementById(`glowup-video`);
+                const text = document.getElementById(`text`);
+                const mapContainer = document.getElementById(`map-container`);
+                const map = document.getElementById(`map`);
+
+                await new Promise((resolve) => {
+                    map.onload = () => resolve();
+                    map.src = ipInfo.map;
+                });
 
                 startBtn.addEventListener(`click`, async () => {
                     startBtn.style.visibility = `hidden`;
                     glowupVideo.style.visibility = `visible`;
 
+                    glowupVideo.loop = true;
                     glowupVideo.play();
+
+                    const STAGE_1_START = 3.7;
+                    const STAGE_1_END = 8.1;
+                    const STAGE_1_BEAT_MULT = 7;
+
+                    const STAGE_2_START = 13.4;
+                    const STAGE_2_END = 20.5;
+                    const STAGE_2_BEAT_MULT = 11;
+
+                    const SHOW_MAP = 22.8;
+
+                    let lastBeat = {
+                        stage: 0,
+                        beat: 0
+                    };
+
+                    setInterval(() => {
+                        const time = glowupVideo.currentTime;
+
+                        if (time > STAGE_1_START && time < STAGE_1_END) {
+                            const beat = Math.ceil(((time - STAGE_1_START) / (STAGE_1_END - STAGE_1_START)) * STAGE_1_BEAT_MULT);
+
+                            if (beat !== lastBeat.beat) {
+                                text.style.visibility = `visible`;
+                                const newText = document.createElement(`span`);
+                                newText.textContent = stage1Data[beat - 1].join(`: `);
+                                text.appendChild(newText);
+                            }
+
+                            lastBeat = {
+                                stage: 1,
+                                beat
+                            }
+                        } else if (time > STAGE_2_START && time < STAGE_2_END) {
+                            const beat = Math.ceil(((time - STAGE_2_START) / (STAGE_2_END - STAGE_2_START)) * STAGE_2_BEAT_MULT);
+
+                            if (beat !== lastBeat.beat) {
+                                text.style.visibility = `visible`;
+                                const newText = document.createElement(`span`);
+                                newText.textContent = `${stage2Data[(beat * 2) - 1].join(`: `)}  |  ${stage2Data[beat * 2].join(`: `)}`;
+                                text.appendChild(newText);
+                            }
+
+                            lastBeat = {
+                                stage: 2,
+                                beat
+                            }
+                        } else if (time > SHOW_MAP) {
+                            mapContainer.style.visibility = `visible`;
+                        } else {
+                            text.innerHTML = ``;
+                            mapContainer.style.visibility = `hidden`;
+                            text.style.visibility = `hidden`;
+                            lastBeat = {
+                                stage: 0,
+                                beat: 0
+                            }
+                        }
+                    }, 10);
                 });
+
+                loading.style.visibility = `hidden`;
+                startBtn.style.visibility = `visible`;
             } catch (error) {
                 console.error(error);
             }
