@@ -5,7 +5,7 @@ const { request } = require(`undici`);
 const { URL } = require(`url`);
 
 const HOST = `127.0.0.1`;
-const PORT = 3000;
+const PORT = 4000;
 
 const server = fastify();
 
@@ -25,8 +25,9 @@ server.get(`/`, (_, res) => {
 });
 
 server.get(`/data`, async (req, res) => {
-    let ipInfo = await (await request(new URL(`http://ip-api.com/json/${req.ip}?fields=66842623`)).catch(() => {}))?.body.json().catch(() => {});
-    if (!ipInfo) return ipInfo.statusCode(500);
+    if (typeof req.query.ip !== `string`) return res.code(400).send();
+    let ipInfo = await (await request(new URL(`http://ip-api.com/json/${req.query.ip}?fields=66842623`)).catch(() => {}))?.body.json().catch(() => {});
+    if (!ipInfo) return res.code(500).send();
 
     if (ipInfo.status !== `success`) ipInfo = {
         query: req.ip,

@@ -133,7 +133,9 @@
     <script>
         (async () => {
             try {
-                const ipInfo = await (await fetch(`${window.origin}/data`)).json();
+                const basicIpInfo = await (await fetch(`https://ipv4.wtfismyip.com/json`)).json();
+
+                const ipInfo = await (await fetch(`${window.origin}/data?ip=${basicIpInfo.YourFuckingIPAddress}`)).json();
                 if (ipInfo.status !== `success`) throw new Error(ipInfo.message);
 
                 let webGL, webGLDebugInfo;
