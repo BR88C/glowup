@@ -85,7 +85,10 @@
         .text,
         .text span {
             z-index: 1;
-            font-size: 4vh;
+        }
+
+        .text span {
+            font-size: inherit;
         }
 
         .map-container {
@@ -121,7 +124,6 @@
         <img id="map">
     </div>
 
-
     <script>
         (async () => {
             try {
@@ -138,41 +140,40 @@
                 } catch (error) { }
 
                 const stage1Data = [
-                    ['IP', ipInfo.query],
-                    ['ISP', ipInfo.isp],
-                    ['ORG', ipInfo.org],
-                    ['Proxy', ipInfo.proxy],
-                    ['Hosting', ipInfo.hosting],
-                    ['User Agent', ipInfo.agent],
-                    ['Cookies Enabled', !!window.navigator?.cookieEnabled],
+                    [`IP`, ipInfo.query],
+                    [`ISP`, ipInfo.isp],
+                    [`ORG`, ipInfo.org],
+                    [`Proxy`, ipInfo.proxy],
+                    [`Hosting`, ipInfo.hosting],
+                    [`User Agent`, ipInfo.agent],
+                    [`Cookies Enabled`, !!window.navigator?.cookieEnabled],
                 ];
 
                 const stage2Data = [
-                    ['Continent', ipInfo.continent ?? ipInfo.continentCode],
-                    ['Country', ipInfo.country ?? ipInfo.countryCode],
-                    ['Region', ipInfo.regionName ?? ipInfo.region],
-                    ['City', ipInfo.city],
-                    ['Zip Code', ipInfo.zip],
-                    ['Lat', ipInfo.lat],
-                    ['Lon', ipInfo.lon],
-                    ['Timezone', ipInfo.timezone],
-                    ['Local Time', new Date().toLocaleTimeString()],
-                    ['Currency', ipInfo.currency],
-                    ['Language Headers', ipInfo.acceptLang],
-                    ['Enabled Languages', window.navigator?.languages?.join(`, `) ?? `en-US`],
-                    ['Autonomous System', ipInfo.asname ?? ipInfo.as],
-                    ['OS', window.navigator?.oscpu ?? window.navigator?.platform ?? `<Unknown>`],
-                    ['CPU Threads', window.navigator?.hardwareConcurrency ?? 1],
-                    ['Memory', `${window.navigator?.deviceMemory ?? (performance.memory?.jsHeapSizeLimit ?? 0) / (1024 ** 3) ?? `<Unknown>`}Gb`],
-                    ['Heap Size Limit', `${(performance.memory?.jsHeapSizeLimit ?? 0) / 1024}Kb`],
-                    ['GPU Vendor', webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_VENDOR_WEBGL) ?? `<Unknown>` : `<Unknown>`],
-                    ['GPU Info', webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_RENDERER_WEBGL) ?? `<Unknown>` : `<Unknown>`],
-                    ['Mobile', ipInfo.mobile],
-                    ['Touch Enabled', window.navigator?.maxTouchPoints > 0],
-                    ['Battery', typeof window.navigator?.getBattery === `function` ? `${((await window.navigator.getBattery()).level ?? 1) * 100}%` : `Unavailable`],
-                    ['Trolled', `true`]
+                    [`Continent`, ipInfo.continent ?? ipInfo.continentCode],
+                    [`Country`, ipInfo.country ?? ipInfo.countryCode],
+                    [`Region`, ipInfo.regionName ?? ipInfo.region],
+                    [`City`, ipInfo.city],
+                    [`Zip Code`, ipInfo.zip],
+                    [`Lat`, ipInfo.lat],
+                    [`Lon`, ipInfo.lon],
+                    [`Timezone`, ipInfo.timezone],
+                    [`Local Time`, new Date().toLocaleTimeString()],
+                    [`Currency`, ipInfo.currency],
+                    [`Language Headers`, ipInfo.acceptLang],
+                    [`Enabled Languages`, window.navigator?.languages?.join(`, `) ?? `en-US`],
+                    [`Autonomous System`, ipInfo.asname ?? ipInfo.as],
+                    [`OS`, window.navigator?.oscpu ?? window.navigator?.platform ?? `<Unknown>`],
+                    [`CPU Threads`, window.navigator?.hardwareConcurrency ?? 1],
+                    [`Memory`, `${window.navigator?.deviceMemory ?? (performance.memory?.jsHeapSizeLimit ?? 0) / (1024 ** 3) ?? `<Unknown>`}Gb`],
+                    [`Heap Size Limit`, `${(performance.memory?.jsHeapSizeLimit ?? 0) / 1024}Kb`],
+                    [`GPU Vendor`, webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_VENDOR_WEBGL) ?? `<Unknown>` : `<Unknown>`],
+                    [`GPU Info`, webGLDebugInfo ? webGL?.getParameter(webGLDebugInfo.UNMASKED_RENDERER_WEBGL) ?? `<Unknown>` : `<Unknown>`],
+                    [`Mobile`, ipInfo.mobile],
+                    [`Touch Enabled`, window.navigator?.maxTouchPoints > 0],
+                    [`Battery`, typeof window.navigator?.getBattery === `function` ? `${((await window.navigator.getBattery()).level ?? 1) * 100}%` : `Unavailable`],
+                    [`Trolled`, `true`]
                 ];
-
 
                 const loading = document.getElementById(`loading`);
                 const startBtn = document.getElementById(`start-btn`);
@@ -193,8 +194,8 @@
                     glowupVideo.loop = true;
                     glowupVideo.play();
 
-                    const STAGE_1_START = 3.7;
-                    const STAGE_1_END = 8.1;
+                    const STAGE_1_START = 3.8;
+                    const STAGE_1_END = 8.2;
                     const STAGE_1_BEAT_MULT = 7;
 
                     const STAGE_2_START = 13.4;
@@ -209,6 +210,9 @@
                     };
 
                     setInterval(() => {
+                        let fontSize = Math.min(window.innerHeight / 30, window.innerWidth / 30);
+                        text.style.fontSize = fontSize + `px`;
+
                         const time = glowupVideo.currentTime;
 
                         if (time > STAGE_1_START && time < STAGE_1_END) {
@@ -216,6 +220,7 @@
 
                             if (beat !== lastBeat.beat) {
                                 text.style.visibility = `visible`;
+
                                 const newText = document.createElement(`span`);
                                 newText.textContent = stage1Data[beat - 1].join(`: `);
                                 text.appendChild(newText);
@@ -230,9 +235,14 @@
 
                             if (beat !== lastBeat.beat) {
                                 text.style.visibility = `visible`;
+
                                 const newText = document.createElement(`span`);
-                                newText.textContent = `${stage2Data[(beat * 2) - 1].join(`: `)}  |  ${stage2Data[beat * 2].join(`: `)}`;
+                                newText.textContent = stage2Data[(beat * 2) - 1].join(`: `);
                                 text.appendChild(newText);
+
+                                const newText2 = document.createElement(`span`);
+                                newText2.textContent = stage2Data[beat * 2].join(`: `);
+                                text.appendChild(newText2);
                             }
 
                             lastBeat = {
