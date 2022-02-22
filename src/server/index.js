@@ -5,7 +5,7 @@ const { request } = require(`undici`);
 const { URL } = require(`url`);
 
 const HOST = `127.0.0.1`;
-const PORT = 8080;
+const PORT = 3000;
 
 const server = fastify();
 
