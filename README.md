@@ -1,2 +1,2 @@
-# get-badfirmware
-A joke website
+# [get.badfirmware.com](https://get.badfirmware.com)
+A silly joke website
