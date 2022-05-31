@@ -1,2 +1,1 @@
-# [get.badfirmware.com](https://get.badfirmware.com)
-A silly joke website that plays a funny glowup video
+Just made fork to say this was epic
