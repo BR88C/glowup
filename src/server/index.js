@@ -1,8 +1,8 @@
+const fastifyStatic = require(`@fastify/static`);
 const fastify = require(`fastify`);
-const fastifyStatic = require(`fastify-static`);
-const { resolve } = require(`path`);
+const { resolve } = require(`node:path`);
+const { URL } = require(`node:url`);
 const { request } = require(`undici`);
-const { URL } = require(`url`);
 
 const HOST = `127.0.0.1`;
 const PORT = 4000;
@@ -10,10 +10,6 @@ const PORT = 4000;
 const server = fastify();
 
 server.addHook(`onReady`, () => console.log(`Server listening on http://${HOST}:${PORT}`));
-server.addHook(`onRequest`, (req, _, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
 
 server.register(fastifyStatic, {
     prefix: `/`,

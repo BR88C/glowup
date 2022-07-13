@@ -1,7 +1,7 @@
 {
-  "name": "get-badfirmware",
-  "version": "1.0.0",
-  "description": "A joke website",
+  "name": "get.badfirmware.com",
+  "version": "0.0.0",
+  "description": "A silly joke website that plays a funny glowup video.",
   "main": "./src/server/index.js",
   "scripts": {
     "start": "node ./src/server/index.js"
@@ -12,18 +12,18 @@
   ],
   "homepage": "https://get.badfirmware.com",
   "bugs": {
-    "url": "https://github.com/BR88C/get-badfirmware/issues"
+    "url": "https://github.com/BR88C/get.badfirmware.com/issues"
   },
   "license": "GPL-3.0",
   "author": "BR88C",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BR88C/get-badfirmware.git"
+    "url": "git+https://github.com/BR88C/get.badfirmware.com.git"
   },
   "dependencies": {
-    "fastify": "^3.27.2",
-    "fastify-static": "^4.5.0",
-    "undici": "^4.14.1"
+    "@fastify/static": "^6.4.0",
+    "fastify": "^4.2.1",
+    "undici": "^5.7.0"
   },
   "engines": {
     "node": ">=16.13.0",
